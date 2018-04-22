@@ -32,6 +32,14 @@ public class LevelManager : MonoBehaviour {
             {0, 0, 0},
             {0, 0, 0},
             {0, 1, 0}
+        },
+        {
+            {0, 0, 0},
+            {1, 0, 0},
+            {0, 0, 1},
+            {0, 0, 0},
+            {0, 0, 0},
+            {0, 1, 0}
         }
     };
 
@@ -59,18 +67,17 @@ public class LevelManager : MonoBehaviour {
         if (Input.GetButtonDown("Up")) {
 
             Vector3 posFront = g_player.transform.position + (g_player.transform.rotation * Vector3.forward);
-            Vector3 posAbove = posFront + Vector3.up;
+            Vector3 posAbove = g_player.transform.position + Vector3.up;
+            Vector3 posAboveFront = posFront + Vector3.up;
 
             GameObject objFront = get(g_objects, posFront);
             GameObject objAbove = get(g_objects, posAbove);
-
-            // Debug.LogFormat("front: {0} {1}", posFront, objFront != null);
-            // Debug.LogFormat("above: {0} {1}", posAbove, objAbove != null);
+            GameObject objAboveFront = get(g_objects, posAboveFront);
 
             if (objFront != null) {
                 Debug.Log("detected object in front");
-                if (objAbove == null) {
-                    g_player.transform.position = posAbove;
+                if (objAbove == null && objAboveFront == null) {
+                    g_player.transform.position = posAboveFront;
                 }
             } else {
                 Debug.Log("nothing in front");
@@ -140,6 +147,7 @@ public class LevelManager : MonoBehaviour {
         Debug.LogFormat("projection stepped {0} times", count);
         return curObj;
     }
+
 
     // my dumb testing framework
     int testsPassed;
