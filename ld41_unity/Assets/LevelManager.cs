@@ -42,7 +42,9 @@ public class LevelManager : MonoBehaviour {
     void Start() {
         g_objects = load(data0);
 
-        test(g_objects);
+        if (Debug.isDebugBuild) {
+            test(g_objects);
+        }
 
         g_player = Instantiate(playerPrefab, new Vector3(0, 1, 0), Quaternion.identity);
     }
@@ -162,6 +164,7 @@ public class LevelManager : MonoBehaviour {
 
         // TODO
 
+        Debug.LogFormat("{0} out of {1} tests passed.", testsPassed, testsTotal);
         if (testsTotal == testsPassed) {
             Debug.Log("All tests passed!");
         }
