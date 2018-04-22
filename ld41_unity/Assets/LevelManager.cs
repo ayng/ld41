@@ -48,10 +48,14 @@ public class LevelManager : MonoBehaviour {
         }
     };
 
-    // constants
-    private const float k_cameraDistance = 1000.0f;
+    // --- constants
 
-    // globals, prefixed with "g_"
+    // in 2d mode, distance between camera and player.
+    // assumes far clipping plane is much further than 500 units away.
+    private const float k_cameraDistance = 500.0f;
+
+    // --- globals, prefixed with "g_"
+
     GameObject     g_player;
     GameObject[,,] g_objects;
 
