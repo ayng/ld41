@@ -82,12 +82,20 @@ public class LevelManager : MonoBehaviour {
     int testsPassed;
     int testsTotal;
     private void test(GameObject[,,] objects) {
+        // test project()
         assert(project(objects, new Vector3(1, 1, 1), new Vector3(0, 0, 1)) != null);
         assert(project(objects, new Vector3(1, 1, 2), new Vector3(0, 0, 1)) != null);
         assert(project(objects, new Vector3(1, 1, 2), new Vector3(0, 0, 1)) 
             == project(objects, new Vector3(1, 1, 1), new Vector3(0, 0, 1))
         );
         assert(project(objects, new Vector3(1, 1, 2), new Vector3(1, 0, 0)) == null);
+
+        // test ...
+        // TODO
+
+        if (testsTotal == testsPassed) {
+            Debug.Log("All tests passed!");
+        }
     }
 
     private void assert(bool cond) {
