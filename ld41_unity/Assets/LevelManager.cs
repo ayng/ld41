@@ -261,6 +261,10 @@ public class LevelManager : MonoBehaviour {
                 (k_cameraDistance * g_from);
             Camera.main.transform.LookAt(g_2dplayer.transform);
         }
+
+        if (Mathf.Abs((g_player.transform.position - g_goal.transform.position).magnitude) < 1e-2) {
+            nextLevel();
+        }
     }
 
     string board2string(GameObject[,] board) {
