@@ -82,45 +82,82 @@ public class LevelManager : MonoBehaviour {
 
     private static readonly Level level2 = new Level(new int[,,]{
         {
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0},
-            {1, 1, 1, 0, 0},
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {1, 1, 1, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
         },
         {
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0},
-            {0, 0, 1, 0, 0},
-            {0, 0, 0, 0, 0},
-            {0, 1, 1, 1, 0},
+            {0, 0, 0, 0},
+            {0, 0, 1, 0},
+            {0, 0, 0, 0},
+            {0, 1, 1, 1},
         },
         {
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0},
-            {0, 0, 1, 1, 0},
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 1, 1},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
         },
         {
-            {0, 0, 0, 0, 0},
-            {0, 0, 1, 1, 0},
-            {0, 0, 1, 0, 0},
-            {0, 0, 1, 0, 0},
-            {0, 0, 1, 0, 0},
+            {0, 0, 1, 1},
+            {0, 0, 1, 0},
+            {0, 0, 1, 0},
+            {0, 0, 1, 0},
+        },
+    }, new Vector3(0, 1, 1), new Vector3(2, 4, 3), 45.0f);
+
+    private static readonly Level lvSteps = new Level(new int[,,]{
+        {
+            {1, 1},
+            {1, 1},
         },
         {
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0},
+            {0, 1},
+            {1, 1},
         },
-    }, new Vector3(0, 1, 2), new Vector3(2, 4, 4), 45.0f);
+        {
+            {0, 1},
+            {0, 1},
+        },
+        {
+            {0, 1},
+            {0, 0},
+        },
+    }, new Vector3(0, 1, 0), new Vector3(1, 4, 0), 45.0f);
+    private static readonly Level lvTower = new Level(new int[,,]{
+        {
+            {1, 1, 1, 0, 0, 0, 1, 1, 1},
+            {1, 1, 1, 1, 1, 1, 1, 1, 1},
+            {1, 1, 1, 0, 0, 0, 1, 1, 1},
+        },
+        {
+            {0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 1, 0},
+            {0, 0, 0, 0, 0, 0, 0, 1, 0},
+        },
+        {
+            {0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 1, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 1},
+        },
+        {
+            {0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 1, 1},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        },
+        {
+            {0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 1, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        },
+    }, new Vector3(1, 1, 1), new Vector3(7, 5, 1), 45.0f);
 
     private static readonly Level[] levels = new Level[]{
         level1,
         level2,
+        lvSteps,
+        lvTower,
         debugLevel,
     };
 
@@ -174,9 +211,9 @@ public class LevelManager : MonoBehaviour {
         g_states = new Stack<State>();
         
         if (Debug.isDebugBuild) {
-            g_objects = load(data0);
-            test(g_objects);
-            unload(g_objects);
+            //g_objects = load(data0);
+            //test(g_objects);
+            //unload(g_objects);
         }
 
         g_player = Instantiate(playerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
@@ -191,7 +228,9 @@ public class LevelManager : MonoBehaviour {
         g_curLevel = (g_curLevel + 1) % levels.GetLength(0);
         var next = levels[g_curLevel];
 
-        unload(g_objects);
+        if (g_objects != null) {
+            unload(g_objects);
+        }
 
         g_objects = load(next.data);
         g_player.transform.position = next.start;
@@ -369,6 +408,10 @@ public class LevelManager : MonoBehaviour {
                 g_2dplayer.transform.position -
                 (k_cameraDistance * g_from);
             Camera.main.transform.LookAt(g_2dplayer.transform);
+        }
+
+        if (Input.GetButtonDown("Quit")) {
+            Application.Quit();
         }
     }
 
