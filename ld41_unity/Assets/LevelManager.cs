@@ -8,6 +8,7 @@ public class LevelManager : MonoBehaviour {
 
     public GameObject blockPrefab;
     public GameObject playerPrefab;
+    public GameObject player2dPrefab;
 
     // MAP LAYOUT
     // layers of y, in order of bottom to top
@@ -52,6 +53,7 @@ public class LevelManager : MonoBehaviour {
     Vector2        g_2dpos;
     GameObject     g_target;
     Vector3        g_from;
+    GameObject     g_2dplayer;
 
     void Start() {
         g_objects = load(data0);
@@ -61,6 +63,7 @@ public class LevelManager : MonoBehaviour {
         }
 
         g_player = Instantiate(playerPrefab, new Vector3(0, 1, 0), Quaternion.identity);
+        g_2dplayer = Instantiate(player2dPrefab, new Vector3(0, 0, 0), Quaternion.identity);
     }
 
     void Update() {
@@ -110,7 +113,10 @@ public class LevelManager : MonoBehaviour {
                         Debug.Log(board2string(g_board));
                     }
                     g_2dpos = boardPos(g_objects, target.transform.position, from);
-                    Debug.Log(g_2dpos);
+                    g_2dplayer.transform.position = g_target.transform.position - g_from;
+                    // make 3d player invisible
+                    g_player.SetActive(false);
+                    g_2dplayer.SetActive(true);
                 }
             }
         } else { // 2d mode
@@ -134,6 +140,7 @@ public class LevelManager : MonoBehaviour {
                 if (target != null) {
                     g_target = target;
                     g_2dpos = new2dpos;
+                    g_2dplayer.transform.position = g_target.transform.position - g_from;
                     Debug.Log(g_2dpos);
                 }
             }
@@ -143,6 +150,9 @@ public class LevelManager : MonoBehaviour {
                 if (objBelow != null) {
                     g_player.transform.position = objBelow.transform.position + Vector3.up;
                     g_target = null;
+                    // make 3d player visible
+                    g_player.SetActive(true);
+                    g_2dplayer.SetActive(false);
                 } else {
                     // TODO show 3d perspective and indicate failure state
                     Debug.Log("nothing below, failure state");
