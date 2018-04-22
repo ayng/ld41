@@ -3,16 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-class Level {
-    public int[,,] data;
-    public Vector3 start;
-    public Vector3 end;
-    public Level(int[,,] d, Vector3 s, Vector3 e) {
-        data = d;
-        start = s;
-        end = e;
-    }
-}
 
 public class LevelManager : MonoBehaviour {
 
@@ -25,6 +15,18 @@ public class LevelManager : MonoBehaviour {
     public Vector3 cameraPosition = new Vector3(0, 10, -20);
     public float cameraRotationSpeed = 2.0f;
 
+    class Level {
+        public int[,,] data;
+        public Vector3 start;
+        public Vector3 end;
+        public float rot;
+        public Level(int[,,] d, Vector3 s, Vector3 e, float r) {
+            data = d;
+            start = s;
+            end = e;
+            rot = r;
+        }
+    }
     // MAP LAYOUT
     // layers of y, in order from bottom to top
     // each layer:
@@ -59,10 +61,11 @@ public class LevelManager : MonoBehaviour {
         }
     };
     private static readonly Level debugLevel =
-        new Level(data0, new Vector3(0, 1, 0), new Vector3(2, 3, 2));
+        new Level(data0, new Vector3(0, 1, 0), new Vector3(2, 3, 2), 45.0f);
 
     private static readonly Vector3 start1 = new Vector3(0, 1, 0);
     private static readonly Vector3 end1 = new Vector3(4, 1, 1);
+    private static readonly float rot1 = 45.0f;
     private static readonly int[,,] data1 = new int[,,]{
         {
             {1, 1, 0, 0, 0},
@@ -75,7 +78,7 @@ public class LevelManager : MonoBehaviour {
             {0, 1, 1, 1, 0},
         },
     };
-    private static readonly Level level1 = new Level(data1, start1, end1);
+    private static readonly Level level1 = new Level(data1, start1, end1, rot1);
 
     private static readonly Level[] levels = new Level[]{
         level1,
@@ -154,6 +157,8 @@ public class LevelManager : MonoBehaviour {
         g_objects = load(next.data);
         g_player.transform.position = next.start;
         g_goal.transform.position = next.end;
+
+        cameraRotation = new Vector3(0, next.rot, 0);
 
         g_states.Clear();
     }
