@@ -55,14 +55,27 @@ public class LevelManager : MonoBehaviour {
             g_player.transform.Rotate(new Vector3(0, 90, 0));
         }
         if (Input.GetButtonDown("Up")) {
-            Vector3 posInFront = g_player.transform.position + (g_player.transform.rotation * Vector3.forward);
-            GameObject objInFront = get(g_objects, posInFront);
-            Debug.LogFormat("object in front: {0}", objInFront);
-            if (objInFront == null) {
-                g_player.transform.position += g_player.transform.rotation * Vector3.forward;
+
+            Vector3 posFront = g_player.transform.position + (g_player.transform.rotation * Vector3.forward);
+            Vector3 posAbove = posFront + Vector3.up;
+            Vector3 posBelow = posFront + Vector3.down;
+
+            GameObject objFront = get(g_objects, posFront);
+            GameObject objAbove = get(g_objects, posAbove);
+            GameObject objBelow = get(g_objects, posBelow);
+
+            Debug.LogFormat("front: {0} {1}", posFront, objFront != null);
+            Debug.LogFormat("above: {0} {1}", posAbove, objAbove != null);
+            Debug.LogFormat("below: {0} {1}", posBelow, objBelow != null);
+
+            if (objFront == null && objBelow != null) {
+                Debug.Log("forward");
+                g_player.transform.position = posFront;
+            } else if (objFront != null && objAbove == null) {
+                Debug.Log("climb");
+                g_player.transform.position = posAbove;
             } else {
-                GameObject objOverFront = get(g_objects, posInFront + Vector3.up);
-                Debug.LogFormat("object over front: {0}", objOverFront);
+                Debug.Log("can't move forward");
             }
         }
         if (Input.GetButtonDown("Down")) {
@@ -86,9 +99,9 @@ public class LevelManager : MonoBehaviour {
     }
 
     bool inBounds(Vector3 pos, GameObject[,,] objects) {
-        return 0 < pos.y && pos.y < objects.GetLength(0)
-            && 0 < pos.z && pos.z < objects.GetLength(1)
-            && 0 < pos.x && pos.x < objects.GetLength(2)
+        return 0 <= pos.y && pos.y < objects.GetLength(0)
+            && 0 <= pos.z && pos.z < objects.GetLength(1)
+            && 0 <= pos.x && pos.x < objects.GetLength(2)
             ;
     }
 
@@ -96,19 +109,15 @@ public class LevelManager : MonoBehaviour {
         if (!inBounds(pos, objects)) {
             return null;
         }
-        var x = (int) pos.x;
-        var y = (int) pos.y;
-        var z = (int) pos.z;
-        if (x != pos.x || y != pos.y || z != pos.z) {
-            Debug.LogWarningFormat("get() was called with non-integer Vector3: {0}", pos);
-            Debug.LogWarningFormat("coercing: {0}, {1}, {2}", x, y, z);
-        }
+        int x = (int) Mathf.Round(pos.x);
+        int y = (int) Mathf.Round(pos.y);
+        int z = (int) Mathf.Round(pos.z);
         return objects[y, z, x];
     }
 
     GameObject project(GameObject[,,] objects, Vector3 pos, Vector3 dir) {
         for (var curPos = pos; inBounds(curPos, objects); curPos += dir) {
-            var curObj = objects[(int)curPos.y,(int)curPos.z,(int)curPos.x];
+            var curObj = get(objects, curPos);
             if (curObj != null) {
                 return curObj;
             }
@@ -128,7 +137,12 @@ public class LevelManager : MonoBehaviour {
         );
         assert(project(objects, new Vector3(1, 1, 2), new Vector3(1, 0, 0)) == null);
 
-        // test ...
+        // test get()
+        assert(get(objects, new Vector3(0, 0, 0)) != null);
+        assert(get(objects, new Vector3(0, 1, 0)) == null);
+        assert(get(objects, new Vector3(0, 1, 1)) != null);
+        assert(get(objects, new Vector3(1, 1, 0)) == null);
+
         // TODO
 
         if (testsTotal == testsPassed) {
