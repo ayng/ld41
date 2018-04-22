@@ -80,8 +80,47 @@ public class LevelManager : MonoBehaviour {
     };
     private static readonly Level level1 = new Level(data1, start1, end1, rot1);
 
+    private static readonly Level level2 = new Level(new int[,,]{
+        {
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {1, 1, 1, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+        },
+        {
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 1, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 1, 1, 1, 0},
+        },
+        {
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 1, 1, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+        },
+        {
+            {0, 0, 0, 0, 0},
+            {0, 0, 1, 1, 0},
+            {0, 0, 1, 0, 0},
+            {0, 0, 1, 0, 0},
+            {0, 0, 1, 0, 0},
+        },
+        {
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+        },
+    }, new Vector3(0, 1, 2), new Vector3(2, 4, 4), 45.0f);
+
     private static readonly Level[] levels = new Level[]{
         level1,
+        level2,
         debugLevel,
     };
 
@@ -254,18 +293,10 @@ public class LevelManager : MonoBehaviour {
 
                 Vector2 new2dpos = g_2dpos;
                 if (Input.GetButtonDown("Left")) {
-                    if (g_from == Vector3.back || g_from == Vector3.right) {
-                        new2dpos += Vector2.right;
-                    } else {
-                        new2dpos += Vector2.left;
-                    }
+                    new2dpos += Vector2.left;
                 }
                 if (Input.GetButtonDown("Right")) {
-                    if (g_from == Vector3.back || g_from == Vector3.right) {
-                        new2dpos += Vector2.left;
-                    } else {
-                        new2dpos += Vector2.right;
-                    }
+                    new2dpos += Vector2.right;
                 }
                 if (Input.GetButtonDown("Up")) {
                     new2dpos += Vector2.up;
@@ -274,6 +305,7 @@ public class LevelManager : MonoBehaviour {
                     new2dpos += Vector2.down;
                 }
                 GameObject target = get2d(g_board, new2dpos);
+                Debug.Log(new2dpos);
 
                 if (target != null) {
                     pushState();
@@ -453,13 +485,12 @@ public class LevelManager : MonoBehaviour {
             result = new GameObject[lx, ly];
             for (int y = 0; y < ly; y++) {
                 for (int x = 0; x < lx; x++) {
-                    result[lx-1-x,y] = project(objects, new Vector3(lx-1-x, y, lz-1), dir);
+                    result[x,y] = project(objects, new Vector3(lx-1-x, y, lz-1), dir);
                 }
             }
             return result;
         }
         if (dir == Vector3.left) {
-            Debug.Log("left projection");
             result = new GameObject[lz, ly];
             for (int y = 0; y < ly; y++) {
                 for (int z = 0; z < lz; z++) {
@@ -472,7 +503,7 @@ public class LevelManager : MonoBehaviour {
             result = new GameObject[lz, ly];
             for (int y = 0; y < ly; y++) {
                 for (int z = 0; z < lz; z++) {
-                    result[lz-1-z,y] = project(objects, new Vector3(0, y, lz-1-z), dir);
+                    result[z,y] = project(objects, new Vector3(0, y, lz-1-z), dir);
                 }
             }
             return result;
