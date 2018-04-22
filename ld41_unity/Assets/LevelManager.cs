@@ -10,8 +10,9 @@ public class LevelManager : MonoBehaviour {
     public GameObject playerPrefab;
     public GameObject player2dPrefab;
 
-    public Vector3 cameraRotation;
-    public Vector3 cameraPosition;
+    public Vector3 cameraRotation = new Vector3(0, 45, 0);
+    public Vector3 cameraPosition = new Vector3(0, 10, -20);
+    public float cameraRotationSpeed = 2.0f;
 
     // MAP LAYOUT
     // layers of y, in order of bottom to top
@@ -176,7 +177,11 @@ public class LevelManager : MonoBehaviour {
 
 
         if (g_target == null) {
-            
+
+            cameraRotation +=
+                cameraRotationSpeed * -1 * Input.GetAxis("Rotate Camera") * Vector3.up;
+
+
             Camera.main.transform.position =
                 g_player.transform.position +
                 (Quaternion.Euler(cameraRotation) * cameraPosition)
