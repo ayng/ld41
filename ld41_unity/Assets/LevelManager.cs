@@ -13,7 +13,7 @@ public class LevelManager : MonoBehaviour {
 
     public Vector3 cameraRotation = new Vector3(0, 45, 0);
     public Vector3 cameraPosition = new Vector3(0, 10, -20);
-    public float cameraRotationSpeed = 2.0f;
+    public float cameraRotationSpeed = 2.5f;
 
     class Level {
         public int[,,] data;
