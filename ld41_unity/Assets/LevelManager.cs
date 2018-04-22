@@ -12,7 +12,7 @@ public class LevelManager : MonoBehaviour {
     public GameObject goalPrefab;
 
     public Vector3 cameraRotation = new Vector3(0, 45, 0);
-    public Vector3 cameraPosition = new Vector3(0, 10, -20);
+    public Vector3 cameraPosition = new Vector3(0, 2, -4);
     public float cameraRotationSpeed = 2.5f;
 
     class Level {
@@ -152,13 +152,93 @@ public class LevelManager : MonoBehaviour {
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
         },
     }, new Vector3(1, 1, 1), new Vector3(7, 5, 1), 45.0f);
+    private static readonly Level lvDrop = new Level(new int[,,]{ {
+            {0, 1, 1},
+        },
+        {
+            {0, 0, 0},
+        },
+        {
+            {1, 0, 0},
+        },
+    }, new Vector3(0, 3, 0), new Vector3(2, 1, 0), -45.0f);
+    private static readonly Level lvDrop2 = new Level(new int[,,]{
+        {
+            {0, 0, 0},
+            {0, 0, 1},
+            {1, 0, 1},
+        },
+        {
+            {1, 0, 0},
+            {0, 0, 0},
+            {0, 0, 0},
+        },
+        {
+            {1, 1, 1},
+            {0, 0, 0},
+            {0, 0, 0},
+        },
+    }, new Vector3(0, 1, 2), new Vector3(2, 1, 2), 135.0f);
+    private static readonly Level lvWalk = new Level(new int[,,]{
+        {
+            {1, 1, 1, 1, 1},
+        },
+    }, new Vector3(0, 1, 0), new Vector3(4, 1, 0), 45.0f);
+    private static readonly Level lvWalk2 = new Level(new int[,,]{
+        {
+            {1, 0, 1, 1, 1},
+            {1, 0, 1, 0, 1},
+            {1, 1, 1, 0, 1},
+        },
+    }, new Vector3(0, 1, 0), new Vector3(4, 1, 2), 45.0f);
+    private static readonly Level lvThanks = new Level(new int[,,]{
+        {
+            {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+            {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+        },
+        {
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+        },
+        {
+            {0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
+            {0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+        },
+        {
+            {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+        },
+        {
+            {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0},
+            {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0},
+            {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        },
+    }, new Vector3(1, 1, 0), new Vector3(29, 1, 3), 45.0f);
 
     private static readonly Level[] levels = new Level[]{
-        level1,
-        level2,
+        lvWalk,
+        lvWalk2,
         lvSteps,
         lvTower,
-        debugLevel,
+        lvDrop,
+        lvDrop2,
+        level2,
+        lvThanks,
+        //debugLevel,
     };
 
     // --- constants
@@ -385,11 +465,14 @@ public class LevelManager : MonoBehaviour {
             // make 3d player visible
             g_player.SetActive(true);
             g_2dplayer.SetActive(false);
+            Camera.main.orthographic = false;
+            Camera.main.fieldOfView = 75;
         } else {
             g_2dplayer.transform.position = g_target.transform.position - g_from;
             // make 3d player invisible
             g_player.SetActive(false);
             g_2dplayer.SetActive(true);
+            Camera.main.orthographic = true;
         }
 
         // camera follow
