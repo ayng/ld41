@@ -232,6 +232,7 @@ MonoBehaviour:
     type: 2}
   cameraRotation: {x: 0, y: 45, z: 0}
   cameraPosition: {x: 0, y: 10, z: -20}
+  cameraRotationSpeed: 2
 --- !u!4 &1452757316
 Transform:
   m_ObjectHideFlags: 0
