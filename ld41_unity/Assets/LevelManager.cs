@@ -93,18 +93,43 @@ public class LevelManager : MonoBehaviour {
     GameObject     g_player;
     GameObject     g_goal;
     GameObject[,,] g_objects;
+    GameObject     g_2dplayer;
 
     // 2d state
     GameObject[,]  g_board;
     Vector2        g_2dpos;
     GameObject     g_target;
     Vector3        g_from;
-    GameObject     g_2dplayer;
 
     // etc
     int g_curLevel = -1;
 
+    // state stack
+    Stack<State> g_states;
+
+    public class State {
+        // 2d state
+        public GameObject[,] board;
+        public Vector2 pos2d;
+        public GameObject target;
+        public Vector3 from;
+
+        // 3d state
+        public Vector3 pos;
+        public Quaternion rot;
+
+        public State(GameObject[,] a, Vector2 b, GameObject c, Vector3 d, Vector3 e, Quaternion f) {
+            board = a;
+            pos2d = b;
+            target = c;
+            from = d;
+            pos = e;
+            rot = f;
+        }
+    }
+
     void Start() {
+        g_states = new Stack<State>();
         
         if (Debug.isDebugBuild) {
             g_objects = load(data0);
@@ -114,26 +139,49 @@ public class LevelManager : MonoBehaviour {
 
         g_player = Instantiate(playerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         g_2dplayer = Instantiate(player2dPrefab, new Vector3(0, 1, 0), Quaternion.identity);
-        g_2dplayer.SetActive(false);
         g_goal = Instantiate(goalPrefab, new Vector3(0, 2, 0), Quaternion.identity);
 
         // load level 1
         nextLevel();
-        
-        unload(g_objects);
-        g_objects = load(data1);
-        g_player.transform.position = start1;
-        g_goal.transform.position = end1;
     }
 
     void nextLevel() {
         g_curLevel = (g_curLevel + 1) % levels.GetLength(0);
         var next = levels[g_curLevel];
+
         unload(g_objects);
 
         g_objects = load(next.data);
         g_player.transform.position = next.start;
         g_goal.transform.position = next.end;
+
+        g_states.Clear();
+    }
+
+    void pushState() {
+        Debug.Log("push");
+        g_states.Push(new State(
+            g_board,
+            g_2dpos,
+            g_target,
+            g_from,
+            g_player.transform.position,
+            g_player.transform.rotation));
+    }
+
+    void popState() {
+        if (g_states.Count == 0) {
+            Debug.Log("nothing to pop!");
+            return;
+        }
+        Debug.Log("pop");
+        var state = g_states.Pop();
+        g_board = state.board;
+        g_2dpos = state.pos2d;
+        g_target = state.target;
+        g_from = state.from;
+        g_player.transform.position = state.pos;
+        g_player.transform.rotation = state.rot;
     }
 
     void Update() {
@@ -144,9 +192,11 @@ public class LevelManager : MonoBehaviour {
             }
 
             if (Input.GetButtonDown("Left")) {
+                pushState();
                 g_player.transform.Rotate(new Vector3(0, -90, 0));
             }
             if (Input.GetButtonDown("Right")) {
+                pushState();
                 g_player.transform.Rotate(new Vector3(0, 90, 0));
             }
             if (Input.GetButtonDown("Up")) {
@@ -162,12 +212,14 @@ public class LevelManager : MonoBehaviour {
                 if (objFront != null) {
                     Debug.Log("detected object in front");
                     if (objAbove == null && objAboveFront == null) {
+                        pushState();
                         g_player.transform.position = posAboveFront;
                     }
                 } else {
                     Debug.Log("nothing in front");
                     var objBelow = project(g_objects, posFront, Vector3.down);
                     if (objBelow != null) {
+                        pushState();
                         g_player.transform.position = objBelow.transform.position + Vector3.up;
                     }
                 }
@@ -181,6 +233,7 @@ public class LevelManager : MonoBehaviour {
                 GameObject target = project(g_objects, g_player.transform.position, from);
 
                 if (target != null) {
+                    pushState();
                     g_from = from;
                     g_target = target;
                     g_board = projection(g_objects, from);
@@ -188,15 +241,12 @@ public class LevelManager : MonoBehaviour {
                         Debug.Log(board2string(g_board));
                     }
                     g_2dpos = boardPos(g_objects, target.transform.position, from);
-                    g_2dplayer.transform.position = g_target.transform.position - g_from;
-                    // make 3d player invisible
-                    g_player.SetActive(false);
-                    g_2dplayer.SetActive(true);
                 }
             }
         } else { // 2d mode
             if (Input.GetButtonDown("Left") || Input.GetButtonDown("Right")
              || Input.GetButtonDown("Up") || Input.GetButtonDown("Down")) {
+
                 Vector2 new2dpos = g_2dpos;
                 if (Input.GetButtonDown("Left")) {
                     if (g_from == Vector3.back || g_from == Vector3.right) {
@@ -221,21 +271,21 @@ public class LevelManager : MonoBehaviour {
                 GameObject target = get2d(g_board, new2dpos);
 
                 if (target != null) {
+                    pushState();
                     g_target = target;
                     g_2dpos = new2dpos;
-                    g_2dplayer.transform.position = g_target.transform.position - g_from;
                     Debug.Log(g_2dpos);
                 }
             }
             if (Input.GetButtonDown("Interact")) {
+
+                pushState();
+
                 Vector3 posOut = g_target.transform.position - g_from;
                 GameObject objBelow = project(g_objects, posOut, Vector3.down);
                 if (objBelow != null) {
                     g_player.transform.position = objBelow.transform.position + Vector3.up;
                     g_target = null;
-                    // make 3d player visible
-                    g_player.SetActive(true);
-                    g_2dplayer.SetActive(false);
                 } else {
                     // TODO show 3d perspective and indicate failure state
                     Debug.Log("nothing below, failure state");
@@ -244,11 +294,33 @@ public class LevelManager : MonoBehaviour {
         }
 
 
+        // touch goal
+        if (Mathf.Abs((g_player.transform.position - g_goal.transform.position).magnitude) < 1e-2) {
+            nextLevel();
+        }
+
+        // undo
+        if (Input.GetButtonDown("Undo")) {
+            popState();
+        }
+
+        // ensure invariants
+        if (g_target == null) {
+            // make 3d player visible
+            g_player.SetActive(true);
+            g_2dplayer.SetActive(false);
+        } else {
+            g_2dplayer.transform.position = g_target.transform.position - g_from;
+            // make 3d player invisible
+            g_player.SetActive(false);
+            g_2dplayer.SetActive(true);
+        }
+
+        // camera follow
         if (g_target == null) {
 
             cameraRotation +=
                 cameraRotationSpeed * -1 * Input.GetAxis("Rotate Camera") * Vector3.up;
-
 
             Camera.main.transform.position =
                 g_player.transform.position +
@@ -260,10 +332,6 @@ public class LevelManager : MonoBehaviour {
                 g_2dplayer.transform.position -
                 (k_cameraDistance * g_from);
             Camera.main.transform.LookAt(g_2dplayer.transform);
-        }
-
-        if (Mathf.Abs((g_player.transform.position - g_goal.transform.position).magnitude) < 1e-2) {
-            nextLevel();
         }
     }
 
