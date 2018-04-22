@@ -12,8 +12,9 @@ public class LevelManager : MonoBehaviour {
     public GameObject goalPrefab;
 
     public Vector3 cameraRotation = new Vector3(0, 45, 0);
-    public Vector3 cameraPosition = new Vector3(0, 2, -4);
+    public Vector3 cameraPosition = new Vector3(0, 8, -5);
     public float cameraRotationSpeed = 2.5f;
+    public float cameraFOV = 60.0f;
 
     class Level {
         public int[,,] data;
@@ -89,6 +90,12 @@ public class LevelManager : MonoBehaviour {
         },
         {
             {0, 0, 0, 0},
+            {2, 0, 1, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+        },
+        {
+            {0, 0, 0, 0},
             {0, 0, 1, 0},
             {0, 0, 0, 0},
             {0, 1, 1, 1},
@@ -104,6 +111,12 @@ public class LevelManager : MonoBehaviour {
             {0, 0, 1, 0},
             {0, 0, 1, 0},
             {0, 0, 1, 0},
+        },
+        {
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 0, 0},
+            {0, 0, 3, 0},
         },
     }, new Vector3(0, 1, 1), new Vector3(2, 4, 3), 45.0f);
 
@@ -161,7 +174,7 @@ public class LevelManager : MonoBehaviour {
         {
             {1, 0, 0},
         },
-    }, new Vector3(0, 3, 0), new Vector3(2, 1, 0), -45.0f);
+    }, new Vector3(0, 3, 0), new Vector3(2, 1, 0), 135.0f);
     private static readonly Level lvDrop2 = new Level(new int[,,]{
         {
             {0, 0, 0},
@@ -191,6 +204,8 @@ public class LevelManager : MonoBehaviour {
             {1, 1, 1, 0, 1},
         },
     }, new Vector3(0, 1, 0), new Vector3(4, 1, 2), 45.0f);
+
+    // thanks for playing!
     private static readonly Level lvThanks = new Level(new int[,,]{
         {
             {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -229,9 +244,23 @@ public class LevelManager : MonoBehaviour {
         },
     }, new Vector3(1, 1, 0), new Vector3(29, 1, 3), 45.0f);
 
+    private static readonly Level lvCamera = new Level(new int[,,]{
+        {
+            {1, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 1, 0},
+            {0, 0, 0, 0, 0, 0, 0, 1, 0},
+        },
+        {
+            {0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        },
+    }, new Vector3(0, 1, 0), new Vector3(7, 1, 2), -135.0f);
+
     private static readonly Level[] levels = new Level[]{
         lvWalk,
         lvWalk2,
+        lvCamera,
         lvSteps,
         lvTower,
         lvDrop,
@@ -300,7 +329,6 @@ public class LevelManager : MonoBehaviour {
         g_2dplayer = Instantiate(player2dPrefab, new Vector3(0, 1, 0), Quaternion.identity);
         g_goal = Instantiate(goalPrefab, new Vector3(0, 2, 0), Quaternion.identity);
 
-        // load level 1
         nextLevel();
     }
 
@@ -315,6 +343,20 @@ public class LevelManager : MonoBehaviour {
         g_objects = load(next.data);
         g_player.transform.position = next.start;
         g_goal.transform.position = next.end;
+        
+        // optionally, specify player and goal locations straight in the data.
+        for (int y = 0; y < next.data.GetLength(0); y++) {
+        for (int z = 0; z < next.data.GetLength(1); z++) {
+        for (int x = 0; x < next.data.GetLength(2); x++) {
+            if (next.data[y,z,x] == 2) {
+                g_player.transform.position = new Vector3(x, y, z);
+            }
+            if (next.data[y,z,x] == 3) {
+                g_goal.transform.position = new Vector3(x, y, z);
+            }
+        }
+        }
+        }
 
         cameraRotation = new Vector3(0, next.rot, 0);
 
@@ -466,7 +508,7 @@ public class LevelManager : MonoBehaviour {
             g_player.SetActive(true);
             g_2dplayer.SetActive(false);
             Camera.main.orthographic = false;
-            Camera.main.fieldOfView = 75;
+            Camera.main.fieldOfView = cameraFOV;
         } else {
             g_2dplayer.transform.position = g_target.transform.position - g_from;
             // make 3d player invisible
