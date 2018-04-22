@@ -228,7 +228,8 @@ MonoBehaviour:
     type: 2}
   playerPrefab: {fileID: 1482625136036452, guid: ae1ee38df11a4d4468ad318cb671984f,
     type: 2}
-  player2dPrefab: {fileID: 0}
+  player2dPrefab: {fileID: 1052787051138870, guid: b0a11b025bd568241b8d19d47a05bc75,
+    type: 2}
 --- !u!4 &1452757316
 Transform:
   m_ObjectHideFlags: 0
