@@ -114,40 +114,27 @@ public class LevelManager : MonoBehaviour {
                 }
             }
         } else { // 2d mode
-            if (Input.GetButtonDown("Left")) {
-                Vector2 new2dpos = g_2dpos + Vector2.left;
-                GameObject target = get2d(g_board, new2dpos);
-
-                if (target != null) {
-                    g_target = target;
-                    g_2dpos = new2dpos;
+            if (Input.GetButtonDown("Left") || Input.GetButtonDown("Right")
+             || Input.GetButtonDown("Up") || Input.GetButtonDown("Down")) {
+                Vector2 new2dpos = g_2dpos;
+                if (Input.GetButtonDown("Left")) {
+                    new2dpos += Vector2.left;
                 }
-            }
-            if (Input.GetButtonDown("Right")) {
-                Vector2 new2dpos = g_2dpos + Vector2.right;
-                GameObject target = get2d(g_board, new2dpos);
-
-                if (target != null) {
-                    g_target = target;
-                    g_2dpos = new2dpos;
+                if (Input.GetButtonDown("Right")) {
+                    new2dpos += Vector2.right;
                 }
-            }
-            if (Input.GetButtonDown("Up")) {
-                Vector2 new2dpos = g_2dpos + Vector2.up;
-                GameObject target = get2d(g_board, new2dpos);
-
-                if (target != null) {
-                    g_target = target;
-                    g_2dpos = new2dpos;
+                if (Input.GetButtonDown("Up")) {
+                    new2dpos += Vector2.up;
                 }
-            }
-            if (Input.GetButtonDown("Down")) {
-                Vector2 new2dpos = g_2dpos + Vector2.down;
+                if (Input.GetButtonDown("Down")) {
+                    new2dpos += Vector2.down;
+                }
                 GameObject target = get2d(g_board, new2dpos);
 
                 if (target != null) {
                     g_target = target;
                     g_2dpos = new2dpos;
+                    Debug.Log(g_2dpos);
                 }
             }
             if (Input.GetButtonDown("Interact")) {
@@ -155,6 +142,7 @@ public class LevelManager : MonoBehaviour {
                 GameObject objBelow = project(g_objects, posOut, Vector3.down);
                 if (objBelow != null) {
                     g_player.transform.position = objBelow.transform.position + Vector3.up;
+                    g_target = null;
                 } else {
                     // TODO show 3d perspective and indicate failure state
                     Debug.Log("nothing below, failure state");
@@ -206,10 +194,11 @@ public class LevelManager : MonoBehaviour {
     }
 
     GameObject get2d(GameObject[,] board, Vector2 pos) {
-        if (0 <= pos.x && pos.x < board.GetLength(0)
-         && 0 <= pos.y && pos.y < board.GetLength(1)) {
-            
+        if (!(0 <= pos.x && pos.x < board.GetLength(0)
+           && 0 <= pos.y && pos.y < board.GetLength(1))) {
+            return null;
         }
+        return board[round(pos.x), round(pos.y)];
     }
     GameObject get(GameObject[,,] objects, Vector3 pos) {
         if (!inBounds(pos, objects)) {
