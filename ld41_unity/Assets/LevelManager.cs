@@ -273,7 +273,7 @@ public class LevelManager : MonoBehaviour {
             return new Vector2(pos.z, pos.y);
         }
         if (dir == Vector3.right) {
-            return new Vector2(lx - 1 - pos.z, pos.y);
+            return new Vector2(lz - 1 - pos.z, pos.y);
         }
 
         Debug.Log("failed to get board coordinates");
