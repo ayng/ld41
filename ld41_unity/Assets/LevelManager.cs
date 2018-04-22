@@ -44,8 +44,14 @@ public class LevelManager : MonoBehaviour {
     };
 
     // globals, prefixed with "g_"
-    GameObject g_player;
+    GameObject     g_player;
     GameObject[,,] g_objects;
+
+    // 2d state
+    GameObject[,]  g_board;
+    Vector2        g_2dpos;
+    GameObject     g_target;
+    Vector3        g_from;
 
     void Start() {
         g_objects = load(data0);
@@ -58,39 +64,120 @@ public class LevelManager : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetButtonDown("Left")) {
-            g_player.transform.Rotate(new Vector3(0, -90, 0));
-        }
-        if (Input.GetButtonDown("Right")) {
-            g_player.transform.Rotate(new Vector3(0, 90, 0));
-        }
-        if (Input.GetButtonDown("Up")) {
+        if (g_target == null) {
+            if (Input.GetButtonDown("Left")) {
+                g_player.transform.Rotate(new Vector3(0, -90, 0));
+            }
+            if (Input.GetButtonDown("Right")) {
+                g_player.transform.Rotate(new Vector3(0, 90, 0));
+            }
+            if (Input.GetButtonDown("Up")) {
 
-            Vector3 posFront = g_player.transform.position + (g_player.transform.rotation * Vector3.forward);
-            Vector3 posAbove = g_player.transform.position + Vector3.up;
-            Vector3 posAboveFront = posFront + Vector3.up;
+                Vector3 posFront = g_player.transform.position + (g_player.transform.rotation * Vector3.forward);
+                Vector3 posAbove = g_player.transform.position + Vector3.up;
+                Vector3 posAboveFront = posFront + Vector3.up;
 
-            GameObject objFront = get(g_objects, posFront);
-            GameObject objAbove = get(g_objects, posAbove);
-            GameObject objAboveFront = get(g_objects, posAboveFront);
+                GameObject objFront = get(g_objects, posFront);
+                GameObject objAbove = get(g_objects, posAbove);
+                GameObject objAboveFront = get(g_objects, posAboveFront);
 
-            if (objFront != null) {
-                Debug.Log("detected object in front");
-                if (objAbove == null && objAboveFront == null) {
-                    g_player.transform.position = posAboveFront;
+                if (objFront != null) {
+                    Debug.Log("detected object in front");
+                    if (objAbove == null && objAboveFront == null) {
+                        g_player.transform.position = posAboveFront;
+                    }
+                } else {
+                    Debug.Log("nothing in front");
+                    var objBelow = project(g_objects, posFront, Vector3.down);
+                    if (objBelow != null) {
+                        g_player.transform.position = objBelow.transform.position + Vector3.up;
+                    }
                 }
-            } else {
-                Debug.Log("nothing in front");
-                var objBelow = project(g_objects, posFront, Vector3.down);
+            }
+            if (Input.GetButtonDown("Down")) {
+                // no 3d backwalk for now
+            }
+            if (Input.GetButtonDown("Interact")) {
+
+                Vector3 from = g_player.transform.rotation * Vector3.forward;
+                GameObject target = project(g_objects, g_player.transform.position, from);
+
+                if (target != null) {
+                    g_from = from;
+                    g_target = target;
+                    g_board = projection(g_objects, from);
+                    if (Debug.isDebugBuild) {
+                        Debug.Log(board2string(g_board));
+                    }
+                    g_2dpos = boardPos(g_objects, target.transform.position, from);
+                    Debug.Log(g_2dpos);
+                }
+            }
+        } else { // 2d mode
+            if (Input.GetButtonDown("Left")) {
+                Vector2 new2dpos = g_2dpos + Vector2.left;
+                GameObject target = get2d(g_board, new2dpos);
+
+                if (target != null) {
+                    g_target = target;
+                    g_2dpos = new2dpos;
+                }
+            }
+            if (Input.GetButtonDown("Right")) {
+                Vector2 new2dpos = g_2dpos + Vector2.right;
+                GameObject target = get2d(g_board, new2dpos);
+
+                if (target != null) {
+                    g_target = target;
+                    g_2dpos = new2dpos;
+                }
+            }
+            if (Input.GetButtonDown("Up")) {
+                Vector2 new2dpos = g_2dpos + Vector2.up;
+                GameObject target = get2d(g_board, new2dpos);
+
+                if (target != null) {
+                    g_target = target;
+                    g_2dpos = new2dpos;
+                }
+            }
+            if (Input.GetButtonDown("Down")) {
+                Vector2 new2dpos = g_2dpos + Vector2.down;
+                GameObject target = get2d(g_board, new2dpos);
+
+                if (target != null) {
+                    g_target = target;
+                    g_2dpos = new2dpos;
+                }
+            }
+            if (Input.GetButtonDown("Interact")) {
+                Vector3 posOut = g_target.transform.position - g_from;
+                GameObject objBelow = project(g_objects, posOut, Vector3.down);
                 if (objBelow != null) {
                     g_player.transform.position = objBelow.transform.position + Vector3.up;
+                } else {
+                    // TODO show 3d perspective and indicate failure state
+                    Debug.Log("nothing below, failure state");
                 }
             }
         }
-        if (Input.GetButtonDown("Down")) {
+    }
+
+    string board2string(GameObject[,] board) {
+        string result = "";
+        result += board.GetLength(0) + "," + board.GetLength(1) + "\n";
+        for (int j = board.GetLength(1) - 1; j >= 0 ; j--) {
+            string line = "";
+            for (int i = 0; i < board.GetLength(0); i++) {
+                if (board[i,j] != null) {
+                    line += "1";
+                } else {
+                    line += "0";
+                }
+            }
+            result += line + "\n";
         }
-        if (Input.GetButtonDown("Interact")) {
-        }
+        return result;
     }
 
     GameObject[,,] load(int[,,] data) {
@@ -118,6 +205,12 @@ public class LevelManager : MonoBehaviour {
         return (int) Mathf.Round(a);
     }
 
+    GameObject get2d(GameObject[,] board, Vector2 pos) {
+        if (0 <= pos.x && pos.x < board.GetLength(0)
+         && 0 <= pos.y && pos.y < board.GetLength(1)) {
+            
+        }
+    }
     GameObject get(GameObject[,,] objects, Vector3 pos) {
         if (!inBounds(pos, objects)) {
             return null;
@@ -125,7 +218,85 @@ public class LevelManager : MonoBehaviour {
         return objects[round(pos.y), round(pos.z), round(pos.x)];
     }
 
+    // return the 2d coordinates of a 3d position in projected space.
+    Vector2 boardPos(GameObject[,,] objects, Vector3 pos, Vector3 dir) {
+        Vector2 result = new Vector2(-1, -1);
+
+        //int ly = objects.GetLength(0);
+        int lz = objects.GetLength(1);
+        int lx = objects.GetLength(2);
+
+        if (dir == Vector3.forward) {
+            return new Vector2(pos.x, pos.y);
+        }
+        if (dir == Vector3.back) {
+            return new Vector2(lx - 1 - pos.x, pos.y);
+        }
+        if (dir == Vector3.left) {
+            return new Vector2(pos.z, pos.y);
+        }
+        if (dir == Vector3.right) {
+            return new Vector2(lx - 1 - pos.z, pos.y);
+        }
+
+        Debug.Log("failed to get board coordinates");
+        return result;
+    }
+
+    // return a 2d projection of the level at a given direction.
+    // TODO everything here is horribly untested.
+    GameObject[,] projection(GameObject[,,] objects, Vector3 dir) {
+        GameObject[,] result = null;
+
+        int ly = objects.GetLength(0);
+        int lz = objects.GetLength(1);
+        int lx = objects.GetLength(2);
+
+        if (dir == Vector3.forward) {
+            result = new GameObject[lx, ly];
+            for (int y = 0; y < ly; y++) {
+                for (int x = 0; x < lx; x++) {
+                    result[x,y] = project(objects, new Vector3(x, y, 0), dir);
+                }
+            }
+            return result;
+        }
+        if (dir == Vector3.back) {
+            result = new GameObject[lx, ly];
+            for (int y = 0; y < ly; y++) {
+                for (int x = 0; x < lx; x++) {
+                    result[lx-1-x,y] = project(objects, new Vector3(lx-1-x, y, lz-1), dir);
+                }
+            }
+            return result;
+        }
+        if (dir == Vector3.left) {
+            Debug.Log("left projection");
+            result = new GameObject[lz, ly];
+            for (int y = 0; y < ly; y++) {
+                for (int z = 0; z < lz; z++) {
+                    result[z,y] = project(objects, new Vector3(lx-1, y, z), dir);
+                }
+            }
+            return result;
+        }
+        if (dir == Vector3.right) {
+            result = new GameObject[lz, ly];
+            for (int y = 0; y < ly; y++) {
+                for (int z = 0; z < lz; z++) {
+                    result[lz-1-z,y] = project(objects, new Vector3(0, y, lz-1-z), dir);
+                }
+            }
+            return result;
+        }
+
+        Debug.LogWarning("projection failed");
+        return result;
+    }
+
     GameObject project(GameObject[,,] objects, Vector3 pos, Vector3 dir) {
+
+        Debug.Log(pos);
 
         int maxSteps = objects.GetLength(0) + objects.GetLength(1) + objects.GetLength(2);
 
