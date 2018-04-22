@@ -230,6 +230,7 @@ MonoBehaviour:
     type: 2}
   player2dPrefab: {fileID: 1052787051138870, guid: b0a11b025bd568241b8d19d47a05bc75,
     type: 2}
+  goalPrefab: {fileID: 1415775699922616, guid: d35b3b5c29e965344b447baf3f82229f, type: 2}
   cameraRotation: {x: 0, y: 45, z: 0}
   cameraPosition: {x: 0, y: 10, z: -20}
   cameraRotationSpeed: 2

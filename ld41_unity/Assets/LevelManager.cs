@@ -3,19 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+class Level {
+    public int[,,] data;
+    public Vector3 start;
+    public Vector3 end;
+    public Level(int[,,] d, Vector3 s, Vector3 e) {
+        data = d;
+        start = s;
+        end = e;
+    }
+}
 
 public class LevelManager : MonoBehaviour {
 
     public GameObject blockPrefab;
     public GameObject playerPrefab;
     public GameObject player2dPrefab;
+    public GameObject goalPrefab;
 
     public Vector3 cameraRotation = new Vector3(0, 45, 0);
     public Vector3 cameraPosition = new Vector3(0, 10, -20);
     public float cameraRotationSpeed = 2.0f;
 
     // MAP LAYOUT
-    // layers of y, in order of bottom to top
+    // layers of y, in order from bottom to top
     // each layer:
     // . x --->
     // z - - -
@@ -47,6 +58,29 @@ public class LevelManager : MonoBehaviour {
             {0, 1, 0}
         }
     };
+    private static readonly Level debugLevel =
+        new Level(data0, new Vector3(0, 1, 0), new Vector3(2, 3, 2));
+
+    private static readonly Vector3 start1 = new Vector3(0, 1, 0);
+    private static readonly Vector3 end1 = new Vector3(4, 1, 1);
+    private static readonly int[,,] data1 = new int[,,]{
+        {
+            {1, 1, 0, 0, 0},
+            {0, 0, 0, 1, 1},
+            {0, 0, 0, 0, 0},
+        },
+        {
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 1, 1, 1, 0},
+        },
+    };
+    private static readonly Level level1 = new Level(data1, start1, end1);
+
+    private static readonly Level[] levels = new Level[]{
+        level1,
+        debugLevel,
+    };
 
     // --- constants
 
@@ -54,9 +88,10 @@ public class LevelManager : MonoBehaviour {
     // assumes far clipping plane is much further than 500 units away.
     private const float k_cameraDistance = 500.0f;
 
-    // --- globals, prefixed with "g_"
+    // --- mutable globals, prefixed with "g_"
 
     GameObject     g_player;
+    GameObject     g_goal;
     GameObject[,,] g_objects;
 
     // 2d state
@@ -66,19 +101,48 @@ public class LevelManager : MonoBehaviour {
     Vector3        g_from;
     GameObject     g_2dplayer;
 
-    void Start() {
-        g_objects = load(data0);
+    // etc
+    int g_curLevel = -1;
 
+    void Start() {
+        
         if (Debug.isDebugBuild) {
+            g_objects = load(data0);
             test(g_objects);
+            unload(g_objects);
         }
 
-        g_player = Instantiate(playerPrefab, new Vector3(0, 1, 0), Quaternion.identity);
-        g_2dplayer = Instantiate(player2dPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+        g_player = Instantiate(playerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+        g_2dplayer = Instantiate(player2dPrefab, new Vector3(0, 1, 0), Quaternion.identity);
+        g_2dplayer.SetActive(false);
+        g_goal = Instantiate(goalPrefab, new Vector3(0, 2, 0), Quaternion.identity);
+
+        // load level 1
+        nextLevel();
+        
+        unload(g_objects);
+        g_objects = load(data1);
+        g_player.transform.position = start1;
+        g_goal.transform.position = end1;
+    }
+
+    void nextLevel() {
+        g_curLevel = (g_curLevel + 1) % levels.GetLength(0);
+        var next = levels[g_curLevel];
+        unload(g_objects);
+
+        g_objects = load(next.data);
+        g_player.transform.position = next.start;
+        g_goal.transform.position = next.end;
     }
 
     void Update() {
         if (g_target == null) {
+
+            if (Debug.isDebugBuild && Input.GetKeyDown(KeyCode.N)) {
+                nextLevel();
+            }
+
             if (Input.GetButtonDown("Left")) {
                 g_player.transform.Rotate(new Vector3(0, -90, 0));
             }
@@ -214,6 +278,16 @@ public class LevelManager : MonoBehaviour {
             result += line + "\n";
         }
         return result;
+    }
+
+    void unload(GameObject[,,] objects) {
+        for (int y = 0; y < objects.GetLength(0);  y++) {
+        for (int z = 0; z < objects.GetLength(1);  z++) {
+        for (int x = 0; x < objects.GetLength(2);  x++) {
+            Object.Destroy(objects[y,z,x]);
+        }
+        }
+        }
     }
 
     GameObject[,,] load(int[,,] data) {
