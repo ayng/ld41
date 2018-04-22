@@ -35,16 +35,40 @@ public class LevelManager : MonoBehaviour {
         }
     };
 
+    // globals, prefixed with "g_"
+    GameObject g_player;
+    GameObject[,,] g_objects;
+
     void Start() {
-        GameObject[,,] objects = load(data0);
+        g_objects = load(data0);
 
-        test(objects);
+        test(g_objects);
 
-        var player = Instantiate(playerPrefab, new Vector3(0, 1, 0), Quaternion.identity);
+        g_player = Instantiate(playerPrefab, new Vector3(0, 1, 0), Quaternion.identity);
     }
 
     void Update() {
-        
+        if (Input.GetButtonDown("Left")) {
+            g_player.transform.Rotate(new Vector3(0, -90, 0));
+        }
+        if (Input.GetButtonDown("Right")) {
+            g_player.transform.Rotate(new Vector3(0, 90, 0));
+        }
+        if (Input.GetButtonDown("Up")) {
+            Vector3 posInFront = g_player.transform.position + (g_player.transform.rotation * Vector3.forward);
+            GameObject objInFront = get(g_objects, posInFront);
+            Debug.LogFormat("object in front: {0}", objInFront);
+            if (objInFront == null) {
+                g_player.transform.position += g_player.transform.rotation * Vector3.forward;
+            } else {
+                GameObject objOverFront = get(g_objects, posInFront + Vector3.up);
+                Debug.LogFormat("object over front: {0}", objOverFront);
+            }
+        }
+        if (Input.GetButtonDown("Down")) {
+        }
+        if (Input.GetButtonDown("Interact")) {
+        }
     }
 
     GameObject[,,] load(int[,,] data) {
@@ -61,11 +85,25 @@ public class LevelManager : MonoBehaviour {
         return result;
     }
 
-    bool inBounds(Vector3 pos, GameObject[,,] data) {
-        return 0 < pos.y && pos.y < data.GetLength(0)
-            && 0 < pos.z && pos.z < data.GetLength(1)
-            && 0 < pos.x && pos.x < data.GetLength(2)
+    bool inBounds(Vector3 pos, GameObject[,,] objects) {
+        return 0 < pos.y && pos.y < objects.GetLength(0)
+            && 0 < pos.z && pos.z < objects.GetLength(1)
+            && 0 < pos.x && pos.x < objects.GetLength(2)
             ;
+    }
+
+    GameObject get(GameObject[,,] objects, Vector3 pos) {
+        if (!inBounds(pos, objects)) {
+            return null;
+        }
+        var x = (int) pos.x;
+        var y = (int) pos.y;
+        var z = (int) pos.z;
+        if (x != pos.x || y != pos.y || z != pos.z) {
+            Debug.LogWarningFormat("get() was called with non-integer Vector3: {0}", pos);
+            Debug.LogWarningFormat("coercing: {0}, {1}, {2}", x, y, z);
+        }
+        return objects[y, z, x];
     }
 
     GameObject project(GameObject[,,] objects, Vector3 pos, Vector3 dir) {
