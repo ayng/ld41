@@ -7,6 +7,7 @@ using UnityEngine;
 public class LevelManager : MonoBehaviour {
 
     public GameObject blockPrefab;
+    public GameObject playerPrefab;
 
     // MAP LAYOUT
     // layers of y, in order of bottom to top
@@ -38,10 +39,12 @@ public class LevelManager : MonoBehaviour {
         GameObject[,,] objects = load(data0);
 
         test(objects);
+
+        var player = Instantiate(playerPrefab, new Vector3(0, 1, 0), Quaternion.identity);
     }
 
     void Update() {
-
+        
     }
 
     GameObject[,,] load(int[,,] data) {
@@ -66,7 +69,7 @@ public class LevelManager : MonoBehaviour {
     }
 
     GameObject project(GameObject[,,] objects, Vector3 pos, Vector3 dir) {
-        for (var curPos = pos + dir; inBounds(curPos, objects); curPos += dir) {
+        for (var curPos = pos; inBounds(curPos, objects); curPos += dir) {
             var curObj = objects[(int)curPos.y,(int)curPos.z,(int)curPos.x];
             if (curObj != null) {
                 return curObj;
@@ -82,7 +85,8 @@ public class LevelManager : MonoBehaviour {
         assert(project(objects, new Vector3(1, 1, 1), new Vector3(0, 0, 1)) != null);
         assert(project(objects, new Vector3(1, 1, 2), new Vector3(0, 0, 1)) != null);
         assert(project(objects, new Vector3(1, 1, 2), new Vector3(0, 0, 1)) 
-            == project(objects, new Vector3(1, 1, 1), new Vector3(0, 0, 1)));
+            == project(objects, new Vector3(1, 1, 1), new Vector3(0, 0, 1))
+        );
         assert(project(objects, new Vector3(1, 1, 2), new Vector3(1, 0, 0)) == null);
     }
 

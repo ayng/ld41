@@ -226,6 +226,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 1400256926104274, guid: 61db902c988aa724ebf39c9f3d314a1c,
     type: 2}
+  playerPrefab: {fileID: 1482625136036452, guid: ae1ee38df11a4d4468ad318cb671984f,
+    type: 2}
 --- !u!4 &1452757316
 Transform:
   m_ObjectHideFlags: 0
