@@ -10,6 +10,9 @@ public class LevelManager : MonoBehaviour {
     public GameObject playerPrefab;
     public GameObject player2dPrefab;
 
+    public Vector3 cameraRotation;
+    public Vector3 cameraPosition;
+
     // MAP LAYOUT
     // layers of y, in order of bottom to top
     // each layer:
@@ -43,6 +46,9 @@ public class LevelManager : MonoBehaviour {
             {0, 1, 0}
         }
     };
+
+    // constants
+    private const float k_cameraDistance = 1000.0f;
 
     // globals, prefixed with "g_"
     GameObject     g_player;
@@ -124,10 +130,18 @@ public class LevelManager : MonoBehaviour {
              || Input.GetButtonDown("Up") || Input.GetButtonDown("Down")) {
                 Vector2 new2dpos = g_2dpos;
                 if (Input.GetButtonDown("Left")) {
-                    new2dpos += Vector2.left;
+                    if (g_from == Vector3.back || g_from == Vector3.right) {
+                        new2dpos += Vector2.right;
+                    } else {
+                        new2dpos += Vector2.left;
+                    }
                 }
                 if (Input.GetButtonDown("Right")) {
-                    new2dpos += Vector2.right;
+                    if (g_from == Vector3.back || g_from == Vector3.right) {
+                        new2dpos += Vector2.left;
+                    } else {
+                        new2dpos += Vector2.right;
+                    }
                 }
                 if (Input.GetButtonDown("Up")) {
                     new2dpos += Vector2.up;
@@ -158,6 +172,21 @@ public class LevelManager : MonoBehaviour {
                     Debug.Log("nothing below, failure state");
                 }
             }
+        }
+
+
+        if (g_target == null) {
+            
+            Camera.main.transform.position =
+                g_player.transform.position +
+                (Quaternion.Euler(cameraRotation) * cameraPosition)
+                ;
+            Camera.main.transform.LookAt(g_player.transform);
+        } else { // 2d mode
+            Camera.main.transform.position =
+                g_2dplayer.transform.position -
+                (k_cameraDistance * g_from);
+            Camera.main.transform.LookAt(g_2dplayer.transform);
         }
     }
 
