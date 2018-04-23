@@ -11,6 +11,8 @@ public class LevelManager : MonoBehaviour {
     public GameObject player2dPrefab;
     public GameObject goalPrefab;
 
+    public GameObject audioManager;
+
     public Vector3 cameraRotation = new Vector3(0, 45, 0);
     public Vector3 cameraPosition = new Vector3(0, 4, -5);
     public float cameraRotationSpeed = 2.5f;
@@ -445,6 +447,7 @@ public class LevelManager : MonoBehaviour {
                 GameObject target = project(g_objects, g_player.transform.position, from);
 
                 if (target != null) {
+                    FindObjectOfType<AudioManager>().Play("Enter2D");
                     pushState();
                     g_from = from;
                     g_target = target;
@@ -489,6 +492,7 @@ public class LevelManager : MonoBehaviour {
                 Vector3 posOut = g_target.transform.position - g_from;
                 GameObject objBelow = project(g_objects, posOut, Vector3.down);
                 if (objBelow != null) {
+                    FindObjectOfType<AudioManager>().Play("Exit2D");
                     g_player.transform.position = objBelow.transform.position + Vector3.up;
                     g_target = null;
                 } else {
