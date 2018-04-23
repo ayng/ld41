@@ -277,6 +277,18 @@ public class LevelManager : MonoBehaviour {
         //debugLevel,
     };
 
+    private static readonly string[] soundNames = new string[]{
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "q5",
+        "q6",
+        "q7",
+        "q8",
+        "answer",
+    };
+
     // --- constants
 
     // in 2d mode, distance between camera and player.
@@ -340,6 +352,10 @@ public class LevelManager : MonoBehaviour {
     }
 
     void nextLevel() {
+
+        int i = (g_curLevel + 1) % soundNames.GetLength(0);
+        FindObjectOfType<AudioManager>().Play(soundNames[i]);
+
         g_curLevel = (g_curLevel + 1) % levels.GetLength(0);
         var next = levels[g_curLevel];
 

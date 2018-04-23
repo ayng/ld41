@@ -290,30 +290,60 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sounds:
-  - name: 
+  - name: Enter2D
     clip: {fileID: 8300000, guid: 5e08f9e8fad011c4cbe78773baafbae7, type: 3}
-    volume: 0
-    pitch: 0
+    volume: 0.5
+    pitch: 1
     source: {fileID: 0}
-  - name: 
-    clip: {fileID: 8300000, guid: 5e08f9e8fad011c4cbe78773baafbae7, type: 3}
-    volume: 0
-    pitch: 0
+  - name: Exit2D
+    clip: {fileID: 8300000, guid: 5ceb76279c392c74f8472e481066fed3, type: 3}
+    volume: 0.7
+    pitch: 1
     source: {fileID: 0}
-  - name: 
-    clip: {fileID: 8300000, guid: 5e08f9e8fad011c4cbe78773baafbae7, type: 3}
-    volume: 0
-    pitch: 0
+  - name: q1
+    clip: {fileID: 8300000, guid: 5ff501b973bb1c344a771f82dc0004b7, type: 3}
+    volume: 1
+    pitch: 1
     source: {fileID: 0}
-  - name: 
-    clip: {fileID: 8300000, guid: 5e08f9e8fad011c4cbe78773baafbae7, type: 3}
-    volume: 0
-    pitch: 0
+  - name: q2
+    clip: {fileID: 8300000, guid: 48768448e5d9a754a8d728c4beff0757, type: 3}
+    volume: 1
+    pitch: 1
     source: {fileID: 0}
-  - name: 
-    clip: {fileID: 8300000, guid: 5e08f9e8fad011c4cbe78773baafbae7, type: 3}
-    volume: 0
-    pitch: 0
+  - name: q3
+    clip: {fileID: 8300000, guid: 99704dec7cbd7b544b0e3e683d94948f, type: 3}
+    volume: 1
+    pitch: 1
+    source: {fileID: 0}
+  - name: q4
+    clip: {fileID: 8300000, guid: c85a5b1c01ccabe4c847e9a089c65c39, type: 3}
+    volume: 1
+    pitch: 1
+    source: {fileID: 0}
+  - name: q5
+    clip: {fileID: 8300000, guid: ea4383227a19a2d43bc7c1d8809b464a, type: 3}
+    volume: 1
+    pitch: 1
+    source: {fileID: 0}
+  - name: q6
+    clip: {fileID: 8300000, guid: a96439a157b7b3140ac01729a6749eed, type: 3}
+    volume: 1
+    pitch: 1
+    source: {fileID: 0}
+  - name: q7
+    clip: {fileID: 8300000, guid: 75ebf21d4929f2649bd86a90964287d2, type: 3}
+    volume: 1
+    pitch: 1
+    source: {fileID: 0}
+  - name: q8
+    clip: {fileID: 8300000, guid: 296060131257d66499b4791911cbb71f, type: 3}
+    volume: 1
+    pitch: 1
+    source: {fileID: 0}
+  - name: answer
+    clip: {fileID: 8300000, guid: fb1a9d11fdbcef748879054a0fed81be, type: 3}
+    volume: 1
+    pitch: 1
     source: {fileID: 0}
 --- !u!4 &955851387
 Transform:
